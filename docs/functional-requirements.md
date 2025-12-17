@@ -25,6 +25,8 @@ A task should have the following properties:
 
 4. **Mark task as Complete**
    - Users can mark a task as completed
+   - Users can only delete tasks once they are completed.
 
 5. **Sort tasks**
    - Users can sort tasks in whatever order they would like
+   - Sorting should be done in a drag and drop interface

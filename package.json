@@ -15,9 +15,17 @@
     "test:backend": "npm run test --workspace=backend",
     "install:all": "npm install && npm run install:frontend && npm run install:backend",
     "install:frontend": "cd packages/frontend && npm install",
-    "install:backend": "cd packages/backend && npm install"
+    "install:backend": "cd packages/backend && npm install",
+    "lint": "eslint packages/*/src/**/*.js",
+    "lint:fix": "eslint packages/*/src/**/*.js --fix",
+    "format": "prettier --write \"packages/*/src/**/*.{js,jsx,json,css,md}\""
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "prettier": "^3.7.4"
   }
 }

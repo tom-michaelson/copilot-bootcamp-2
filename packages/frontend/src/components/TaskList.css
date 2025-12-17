@@ -1,0 +1,29 @@
+.task-list {
+  margin: 2rem 0;
+  transition: background-color 0.3s;
+}
+
+.task-list.dragging-over {
+  background: rgba(108, 99, 255, 0.05);
+  border-radius: 8px;
+  padding: 0.5rem;
+}
+
+.task-list-empty {
+  text-align: center;
+  padding: 3rem;
+  background: white;
+  border-radius: 8px;
+  border: 2px dashed #e0e0e0;
+}
+
+.task-list-empty p {
+  font-size: 1.2rem;
+  color: #999;
+  margin: 0;
+}
+
+.dragging {
+  opacity: 0.6;
+  transform: rotate(2deg);
+}

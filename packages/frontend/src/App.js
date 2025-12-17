@@ -1,124 +1,127 @@
 import React, { useState, useEffect } from 'react';
+import TaskForm from './components/TaskForm';
+import TaskList from './components/TaskList';
+import { taskAPI } from './services/taskAPI';
 import './App.css';
 
 function App() {
-  const [data, setData] = useState([]);
+  const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [newItem, setNewItem] = useState('');
 
   useEffect(() => {
-    fetchData();
+    fetchTasks();
   }, []);
 
-  const fetchData = async () => {
+  const fetchTasks = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/items');
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const result = await response.json();
-      setData(result);
+      const result = await taskAPI.getTasks();
+      setTasks(result);
       setError(null);
     } catch (err) {
-      setError('Failed to fetch data: ' + err.message);
-      console.error('Error fetching data:', err);
+      setError('Failed to fetch tasks: ' + err.message);
+      console.error('Error fetching tasks:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!newItem.trim()) return;
-
+  const handleCreateTask = async (taskData) => {
     try {
-      const response = await fetch('/api/items', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name: newItem }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to add item');
-      }
-
-      const result = await response.json();
-      setData([...data, result]);
-      setNewItem('');
+      const newTask = await taskAPI.createTask(taskData);
+      setTasks([...tasks, newTask]);
+      setError(null);
     } catch (err) {
-      setError('Error adding item: ' + err.message);
-      console.error('Error adding item:', err);
+      setError('Error creating task: ' + err.message);
+      console.error('Error creating task:', err);
     }
   };
 
-  const handleDelete = async (itemId) => {
+  const handleUpdateTask = async (id, taskData) => {
     try {
-      const response = await fetch(`/api/items/${itemId}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete item');
-      }
-
-      setData(data.filter(item => item.id !== itemId));
+      const updatedTask = await taskAPI.updateTask(id, taskData);
+      setTasks(tasks.map((task) => (task.id === id ? updatedTask : task)));
       setError(null);
     } catch (err) {
-      setError('Error deleting item: ' + err.message);
-      console.error('Error deleting item:', err);
+      setError('Error updating task: ' + err.message);
+      console.error('Error updating task:', err);
+    }
+  };
+
+  const handleToggleComplete = async (id) => {
+    try {
+      const updatedTask = await taskAPI.toggleComplete(id);
+      setTasks(tasks.map((task) => (task.id === id ? updatedTask : task)));
+      setError(null);
+    } catch (err) {
+      setError('Error toggling task: ' + err.message);
+      console.error('Error toggling task:', err);
+    }
+  };
+
+  const handleDeleteTask = async (id) => {
+    try {
+      await taskAPI.deleteTask(id);
+      setTasks(tasks.filter((task) => task.id !== id));
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+      console.error('Error deleting task:', err);
+    }
+  };
+
+  const handleReorderTasks = async (reorderedTasks) => {
+    // Optimistic update
+    const newTasks = tasks.map((task) => {
+      const updated = reorderedTasks.find((t) => t.id === task.id);
+      return updated ? { ...task, sort_order: updated.sort_order } : task;
+    });
+    newTasks.sort((a, b) => a.sort_order - b.sort_order);
+    setTasks(newTasks);
+
+    try {
+      await taskAPI.reorderTasks(reorderedTasks);
+      setError(null);
+    } catch (err) {
+      setError('Error reordering tasks: ' + err.message);
+      console.error('Error reordering tasks:', err);
+      // Revert on error
+      fetchTasks();
     }
   };
 
   return (
     <div className="App">
       <header className="App-header">
-        <h1>To Do App</h1>
-        <p>Keep track of your tasks</p>
+        <h1>✨ TODO App ✨</h1>
+        <p>Organize your tasks with style</p>
       </header>
 
-      <main>
-        <section className="add-item-section">
-          <h2>Add New Item</h2>
-          <form onSubmit={handleSubmit}>
-            <input
-              type="text"
-              value={newItem}
-              onChange={(e) => setNewItem(e.target.value)}
-              placeholder="Enter item name"
-            />
-            <button type="submit">Add Item</button>
-          </form>
-        </section>
+      <main className="App-main">
+        <div className="container">
+          {error && <div className="error-message">{error}</div>}
 
-        <section className="items-section">
-          <h2>Items from Database</h2>
-          {loading && <p>Loading data...</p>}
-          {error && <p className="error">{error}</p>}
-          {!loading && !error && (
-            <ul>
-              {data.length > 0 ? (
-                data.map((item) => (
-                  <li key={item.id}>
-                    <span>{item.name}</span>
-                    <button 
-                      onClick={() => handleDelete(item.id)}
-                      className="delete-btn"
-                      type="button"
-                    >
-                      Delete
-                    </button>
-                  </li>
-                ))
-              ) : (
-                <p>No items found. Add some!</p>
-              )}
-            </ul>
-          )}
-        </section>
+          <section className="add-task-section">
+            <h2>Create New Task</h2>
+            <TaskForm onSubmit={handleCreateTask} />
+          </section>
+
+          <section className="tasks-section">
+            <h2>My Tasks</h2>
+            {loading ? (
+              <div className="loading">Loading tasks...</div>
+            ) : (
+              <TaskList
+                tasks={tasks}
+                onReorder={handleReorderTasks}
+                onToggleComplete={handleToggleComplete}
+                onDelete={handleDeleteTask}
+                onEdit={handleUpdateTask}
+              />
+            )}
+          </section>
+        </div>
       </main>
     </div>
   );

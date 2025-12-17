@@ -1,0 +1,191 @@
+.task-item {
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: all 0.3s;
+}
+
+.task-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.task-item.overdue {
+  background: #ff4757;
+  color: white;
+  border-color: #ee2f3b;
+}
+
+.task-item.due-soon {
+  background: #ffd93d;
+  color: white;
+  border-color: #f5c518;
+}
+
+.task-item.completed {
+  opacity: 0.7;
+}
+
+.task-item.completed .task-description {
+  text-decoration: line-through;
+}
+
+.drag-handle {
+  cursor: grab;
+  font-size: 1.2rem;
+  color: #999;
+  user-select: none;
+  padding: 0.25rem;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.task-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+}
+
+.task-checkbox {
+  position: relative;
+}
+
+.task-checkbox input[type='checkbox'] {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.task-details {
+  flex: 1;
+}
+
+.task-description {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.task-due-date {
+  margin: 0.25rem 0 0 0;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.task-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-edit,
+.btn-delete {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 4px;
+  transition: all 0.3s;
+}
+
+.btn-edit:hover {
+  background: rgba(0, 0, 0, 0.1);
+  transform: scale(1.1);
+}
+
+.btn-delete:hover:not(:disabled) {
+  background: rgba(255, 0, 0, 0.1);
+  transform: scale(1.1);
+}
+
+.btn-delete:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Edit mode */
+.task-item.editing {
+  background: #f5f5f5;
+}
+
+.task-edit-form {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  flex: 1;
+  flex-wrap: wrap;
+}
+
+.task-edit-form input[type='text'] {
+  flex: 2;
+  min-width: 200px;
+  padding: 0.5rem;
+  border: 2px solid #6c63ff;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.task-edit-form input[type='date'] {
+  flex: 1;
+  min-width: 150px;
+  padding: 0.5rem;
+  border: 2px solid #6c63ff;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-save,
+.btn-cancel {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-save {
+  background: #6c63ff;
+  color: white;
+}
+
+.btn-save:hover {
+  background: #5a52d5;
+  transform: translateY(-2px);
+}
+
+.btn-cancel {
+  background: #e0e0e0;
+  color: #333;
+}
+
+.btn-cancel:hover {
+  background: #d0d0d0;
+}
+
+/* Animations */
+@keyframes celebrate {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+.task-item.completed {
+  animation: celebrate 0.5s ease-in-out;
+}
